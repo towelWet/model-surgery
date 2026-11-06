@@ -1,0 +1,23 @@
+# gate.toml — promotion rules: a 2-test/<N> candidate may go to 3-final only if every rule passes.
+# NEVER DELETE COMMENTS — explain every non-obvious line.
+# Update comments with the code; do not strip them.
+#
+# Read by `ms gate --base <reports> --cand <reports>`; reports come from `ms eval --out-dir DIR`.
+# higher = true  → cand must be >= base - max_drop   (accuracy-style metric)
+# higher = false → cand must be <= base + max_rise   (loss-style metric)
+# report_only    → printed, never blocks (threshold not decided yet)
+# Defaults below are starting points, not measured tolerances — tune per campaign.
+# Current diagnostic graders cannot authorize promotion, regardless of these tolerances.
+
+[tool]
+acc          = { higher = true, max_drop = 0.02 }   # 104 cases: ~2 cases of slack
+arg_validity = { higher = true, max_drop = 0.03 }
+
+[code]
+acc = { higher = true, max_drop = 0.0 }             # 17 cases: one case = 5.9%, so no slack
+
+[rev]
+acc = { higher = true, max_drop = 0.0 }             # 16 cases: same reasoning
+
+[kl]
+mean_kl = { higher = false, report_only = true }    # base vs itself is 0; absolute cap undecided

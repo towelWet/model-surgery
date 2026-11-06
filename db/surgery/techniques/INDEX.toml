@@ -1,0 +1,7 @@
+# Technique families — general model-surgery techniques (not MoE-expert-specific).
+# NEVER DELETE COMMENTS — update with the tree.
+
+[techniques]
+conversion_moe        = "conversion-moe.md"          # dense→MoE: MoEfication/upcycling, ToMoE, ExpertWeaver
+pruning_distill_speed = "pruning-distill-speed.md"   # structural (dense) prune, distill, active-param speed
+active_b_ceilings     = "active-b-decode-ceilings.md" # bytes/tok + tok/s decode ceilings by active-B

@@ -1,0 +1,7 @@
+# Merging — fold experts together instead of deleting (reference dimension)
+# Verdict for our model: merging LOSES to pruning on Qwen3-30B-A3B generative/code
+# work (HC-SMoE 65.2% vs REAP 95.9% at 50%). Do not pick as primary. Heal with Router KD.
+
+[merging]
+hc_smoe = "merging/hc-smoe.md"  # hierarchical clustering on expert OUTPUTS; retraining-free; best-known merge but 65.2% on 30B-A3B
+m_smoe  = "merging/m-smoe.md"   # routing-logit similarity + usage-freq seeding; weaker than HC-SMoE

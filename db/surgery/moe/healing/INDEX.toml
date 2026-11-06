@@ -1,0 +1,11 @@
+# Healing — recover capability AFTER compression (the step our pruned variants skipped)
+# Order of use: cheapest first. Router KD -> LoRA self-distill -> expert-wise KD.
+
+[healing]
+router_kd        = "healing/router-kd.md"        # CRITICAL: train router only to match base dist; fixes router/expert mismatch = our garbage-tool-args failure; best on fine-grained 128e MoE
+moe_pruner_kd    = "healing/moe-pruner-kd.md"    # expert-wise KD from intact teacher; ~99% recovery; heavier
+on_policy_distill= "healing/on-policy-distill.md" # student generates, intact teacher scores those tokens; after router KD if tool args still bad
+lora_self_distill= "healing/lora-self-distill.md"# LoRA r64 on attn/shared, experts frozen, router trained; distill on real god RE tool traces
+
+[why_this_dimension]
+note = "Root cause of t61-t72 failures was NO heal: router kept pointing at experts that pruning changed -> empty/garbage tool args. This dimension is the fix."

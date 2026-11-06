@@ -1,0 +1,41 @@
+# content.toml — all prose for the "Model Surgery" Word document.
+# Why: text lives as data so build.py stays layout-only and under the 50-line cap.
+# NEVER DELETE COMMENTS — explain every non-obvious line.
+# Update comments with the code; do not strip them.
+
+title    = "Model Surgery"                                          # docx heading 0
+subtitle = "Restructuring a trained model without full retraining"  # italic tagline
+
+[[section]]                                                          # each = H1 + paragraphs
+head = "What it is"
+body = [
+  "Model surgery is the practice of editing an already-trained network directly — its weights, its layers, its internal routing — to change size, speed, or behaviour, instead of training a replacement from scratch.",
+  "The parent model's learned knowledge is the raw material. Surgery rearranges or removes parts of it, then heals the damage with a short recovery step. A full pretraining run costs millions of GPU-hours; surgery costs hours.",
+]
+
+[[section]]
+head = "Why anyone does it"
+body = [
+  "Inference cost tracks active parameters, not total parameters. A model that holds 27B weights but activates 3B per token runs roughly like a 3B model while retaining much of the larger model's capability.",
+  "Surgery is how a dense checkpoint is turned into that shape: cut what contributes least, route around what is redundant, and keep the ends of the network intact.",
+]
+
+[[section]]
+head = "The four technique families"
+body = [
+  "Every published method falls into one of four groups. They compose: a dense model is often pruned, converted, and then distilled in sequence.",
+]
+
+[[section]]
+head = "The working pipeline"
+body = [
+  "Stage order is fixed, and profiling is the intended first stage, but the instrumented profiler is currently unavailable; do not present blocked profiling as run. Profiling ranks candidate layers by angular distance; cutting what looks tidy instead of what ranks low is how quality collapses.",
+  "A baseline captured on the unpruned parent is mandatory. Without it, a post-surgery score means nothing.",
+]
+
+[[section]]
+head = "The gate"
+body = [
+  "Never commit a structural cut based on size alone. Every cut competes on quality lost per active parameter saved.",
+  "Historical record, not a current verification: these numbers were measured before profiling was disabled; the profiler that produced them is currently blocked. Measured on a 64-layer 27B parent: the non-contiguous removal 4-15 plus 40-43 scored 0.336 total distance and won; a blind contiguous 24-39 cut scored 0.480 and dropped tool-selection accuracy to 20%. The first four and last four layers are never cut.",
+]

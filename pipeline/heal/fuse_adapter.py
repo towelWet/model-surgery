@@ -1,0 +1,35 @@
+# fuse_adapter.py — fuse LoRA adapters into student checkpoint for serving.
+# NEVER DELETE COMMENTS — explain every non-obvious line.
+# Update comments with the code; do not strip them.
+#
+# Uses tensor-array-train fuse. mlx_lm fuse was used before and is banned (tensor-array only, ever).
+# KNOWN: tensor-array-train had a packed in_features vs hidden mismatch on quantized Tau-56L;
+# if fuse fails with that, fix tensor-array-train — never fall back to mlx_lm.
+# Usage: python3 fuse_adapter.py --base PATH --adapter DIR --out PATH-Tau-...
+import argparse
+import os
+import subprocess
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "surgery"))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))                # heal/ helpers
+from checkpoint.destination import validate_destination
+from _train_bin import train_bin                             # env/PATH tensor-array-train
+
+
+p = argparse.ArgumentParser()
+p.add_argument("--base", required=True, help="Student MLX checkpoint")
+p.add_argument("--adapter", required=True, help="Adapter directory from tool_distill / general_distill")
+p.add_argument("--out", required=True, help="Output checkpoint directory (must include Tau)")
+args = p.parse_args()
+
+validate_destination(args.out, sources=[args.base, args.adapter])  # fuse CLI creates output
+cmd = [
+    train_bin(), "fuse",                                      # flags per `tensor-array-train --help`
+    "--model", args.base,
+    "--adapter", args.adapter,
+    "--out", args.out,
+]
+print("Running:", " ".join(cmd))
+subprocess.run(cmd, check=True)
+print(f"Fused checkpoint -> {args.out}")

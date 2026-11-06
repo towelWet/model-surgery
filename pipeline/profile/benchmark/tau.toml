@@ -1,0 +1,8 @@
+base_url = "http://127.0.0.1:8765/v1"
+ready_timeout = 120
+request_timeout = 180
+prompt = "Count 1 2 3 4 5."
+max_tokens = 64
+expected_order = "12345"
+min_tok_s = 1.5
+reject_reasoning = false

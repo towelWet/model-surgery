@@ -1,0 +1,43 @@
+# Session state: implemented features require evidence; proposals remain proposals.
+version = 1
+active_item = "audit-and-storage-foundation"
+status = "in_progress"
+
+[scope]
+storage = "Backend-independent safetensors partitioning and expert manipulation"
+runtime = "tensor-array owns selective execution, residency, caching and prefetch"
+training = "Training backend owns expert specialization and selective healing"
+formats = "Safetensors first; GGUF requires separate real parser/writer adapter"
+
+[authorization]
+github_recreation = "Authorized after fixes and publication privacy verification"
+x_publication = "Not authorized"
+publication_gate = "Expanded capabilities must match implementation and evidence"
+
+[phases]
+audit = "In progress: tokenizer, destination safety, naming, truthful docs"
+discovery = "Next: architecture relationships and runtime profiling"
+storage = "Foundation implementation in progress; not yet reviewed or accepted"
+msir = "Proposed: intermediate representation translating checkpoint naming to common tensor/layer/expert graphs"
+dependency_graph = "Proposed: tensor dependency graph before out-of-core scheduling"
+out_of_core = "Proposed: streamed execution bounded by resident memory"
+compatibility = "Proposed: fail-closed engine rejecting unsupported and same-shape-only operations"
+self_test = "Proposed: generator producing per-transformation verification cases"
+vocab_state = "Proposed: vocabulary and training-state surgery; some states unreconstructible"
+optimization = "Proposed: evidence-gated candidates, quantization and merging; experimental transforms labeled"
+healing = "Proposed: selective repair and compatibility-validated reconstruction"
+planner = "Proposed: measured multi-objective optimization search"
+
+[verification]
+synthetic = "Structural tests only; never model-quality proof"
+real_models = "Functional validation not established"
+promotion = "Diagnostic-only evaluation cannot authorize promotion"
+memory = "File partitioning alone does not establish lower runtime memory"
+profiling = "Per-layer residual, MLP and layer-skip routes remain unavailable"
+
+[next]
+review = "Review storage diff, tests, transaction behavior and privacy crop"
+inspect = "Finish tensor-array profiling seam investigation before runtime edits"
+preserve = "Keep existing user changes, immutable history and unrelated processes"
+publish = "Only after expanded audit and verification; fresh history and download"
+preview = "Refresh animated X draft after publication verification; never post"

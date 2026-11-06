@@ -1,0 +1,8 @@
+# model-surgery technique db — surgery dimension registry.
+# One concern per node; each node carries its own INDEX.toml. Browse by dimension.
+# NEVER DELETE COMMENTS — update with the tree.
+
+[nodes]
+moe         = "moe/INDEX.toml"          # MoE expert surgery: scoring / pruning / compression / serving
+techniques  = "techniques/INDEX.toml"   # general technique families: conversion, dense prune, active-param speed
+methodology = "methodology/INDEX.toml"  # the skill's own process: stages / gate / discipline / legitimacy / references

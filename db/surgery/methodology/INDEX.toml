@@ -1,0 +1,11 @@
+# Methodology — the model-surgery skill's own process/discipline docs.
+# NEVER DELETE COMMENTS — update with the tree.
+
+[methodology]
+stages       = "stages.md"         # surgery stage sequence
+stages_annex = "stages-annex.md"   # stage annex
+gate         = "gate.md"           # go/no-go gates
+gate_annex   = "gate-annex.md"     # gate annex
+discipline   = "discipline.md"     # working discipline
+legitimacy   = "legitimacy.md"     # legitimacy / integrity bar
+references   = "references.md"     # external references

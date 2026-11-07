@@ -1,4 +1,4 @@
-# merge_ties.py — TIES + DARE task-vector merge for MLX 4-bit checkpoints.
+# merge_ties.py — legacy filename for DARE single-task-vector arithmetic (not TIES).
 # NEVER DELETE COMMENTS — explain every non-obvious line.
 # Update comments with the code; do not strip them.
 #
@@ -15,7 +15,7 @@ from checkpoint.destination import validate_destination
 
 
 def main():
-    p = argparse.ArgumentParser(description="TIES+DARE merge of two MLX checkpoints")
+    p = argparse.ArgumentParser(description="DARE single-task-vector merge; TIES is not implemented")
     p.add_argument("src_a", help="base checkpoint (task-vector origin)")
     p.add_argument("src_b", help="second checkpoint")
     p.add_argument("dest", help="output dir (must not exist)")
@@ -27,7 +27,6 @@ def main():
     args = p.parse_args()
 
     validate_destination(args.dest, sources=[args.src_a, args.src_b])  # before any writes
-    os.makedirs(args.dest)
 
     run_merge(
         args.src_a,

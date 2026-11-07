@@ -1,7 +1,7 @@
 # Session state: implemented features require evidence; proposals remain proposals.
 version = 1
-active_item = "audit-and-storage-foundation"
-status = "in_progress"
+active_item = "additional-audit-repairs"
+status = "release-held"
 
 [scope]
 storage = "Backend-independent safetensors partitioning and expert manipulation"
@@ -10,14 +10,14 @@ training = "Training backend owns expert specialization and selective healing"
 formats = "Safetensors first; GGUF requires separate real parser/writer adapter"
 
 [authorization]
-github_recreation = "Authorized after fixes and publication privacy verification"
+github_recreation = "Held: no new publication; real-model validation and unsupported capabilities remain blocked"
 x_publication = "Not authorized"
 publication_gate = "Expanded capabilities must match implementation and evidence"
 
 [phases]
-audit = "In progress: tokenizer, destination safety, naming, truthful docs"
-discovery = "Next: architecture relationships and runtime profiling"
-storage = "Foundation implementation in progress; not yet reviewed or accepted"
+audit = "Local correctness, quantization, storage, structured corpus, streaming and runtime-name repairs implemented; see docs/audit.md"
+discovery = "Unique indexed block namespaces discovered; ambiguous stacks and missing profiling routes refuse"
+storage = "Whole regular-file asset preservation and verified byte round trips; not model inference proof"
 msir = "Proposed: intermediate representation translating checkpoint naming to common tensor/layer/expert graphs"
 dependency_graph = "Proposed: tensor dependency graph before out-of-core scheduling"
 out_of_core = "Proposed: streamed execution bounded by resident memory"
@@ -33,11 +33,13 @@ synthetic = "Structural tests only; never model-quality proof"
 real_models = "Functional validation not established"
 promotion = "Diagnostic-only evaluation cannot authorize promotion"
 memory = "File partitioning alone does not establish lower runtime memory"
-profiling = "Per-layer residual, MLP and layer-skip routes remain unavailable"
+profiling = "Block distance, layer-skip NLL, pooled per-layer hidden states via runtime probe routes (Qwen3.5/3.6 MoE only); MLP taps unavailable (moefy disabled)"
 
 [next]
-review = "Review storage diff, tests, transaction behavior and privacy crop"
-inspect = "Finish tensor-array profiling seam investigation before runtime edits"
+review = "Audit repairs verified by fixture tests, full doctor and local publication scan; 2026-11-07 code review fixed VLM block discovery, XML tool-call text, one-file-per-tensor writes (79 tests)"
+open_risk = "Resolved 2026-11-07: DARE now float32 in place (~2.25x one tensor extra peak, was float64 + copies)"
+inspect = "Seam checked 2026-11-07: both runtime trees serve only /v1/models, chat/completions, embeddings, audio/transcriptions; residual, MLP-tap, layer-skip routes absent"
+route_work = "2026-11-07: /v1/layer_ablation + /v1/internals/layer_distance added in both runtime trees (probe gate env); live-tested on AIMER-64e via private runtime build; not installed; MLP tap skipped (moefy disabled)"
 preserve = "Keep existing user changes, immutable history and unrelated processes"
-publish = "Only after expanded audit and verification; fresh history and download"
+publish = "On hold; nothing uploaded, recreated or posted"
 preview = "Refresh animated X draft after publication verification; never post"

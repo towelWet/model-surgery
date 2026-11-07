@@ -37,8 +37,8 @@ MistralMoE, early DeepSeek-MoE, Drop-Upcycling.
 Expert redundancy is **heterogeneous across layers** — uniform budgets are suboptimal.
 
 Toolkit: `pipeline/surgery/moefy/entry.py`, `pipeline/surgery/expert/prune.py <src> <dest-Tau> <usage_json>`,
-`pipeline/profile/moe_fidelity/run.py`. `pipeline/profile/expert/usage.py` is still a placeholder
-(needs tensor-array `/v1/internals/router_logits`).
+`pipeline/profile/moe_fidelity/run.py`. `pipeline/profile/expert/usage.py` is retired (it wrote fake uniform usage);
+measured usage comes from `pipeline/profile/expert/routing_profile.py` (runtime HOPE stats).
 
 ## Hybrid: packed dense + affine MoE (Bonsai)
 

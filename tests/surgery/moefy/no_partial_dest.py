@@ -1,11 +1,11 @@
-"""Impossible moefy partition geometry must fail before destination creation."""
+"""Moefy refuses unvalidated routing before destination creation, including valid geometry."""
 import json
 import sys
 import tempfile
 from pathlib import Path
 
 
-def test_moefy_invalid_geometry_creates_nothing():
+def test_moefy_untrained_router_creates_nothing():
     root = Path(__file__).resolve().parents[3]
     sys.path.insert(0, str(root / "pipeline/surgery"))       # surgery/ bare-import dir
     sys.path.insert(0, str(root / "pipeline/surgery/moefy")) # moefy/ siblings
@@ -13,14 +13,14 @@ def test_moefy_invalid_geometry_creates_nothing():
     with tempfile.TemporaryDirectory() as tmp:
         src = Path(tmp) / "src"
         src.mkdir()
-        # W=100 H=30 E=3: remainder 70 not divisible by 3 -> expert_width raises pre-mkdir
+        # Valid geometry must still refuse: a dimensionally valid partition is not a learned MoE.
         (src / "config.json").write_text(json.dumps(
-            {"hidden_size": 30, "intermediate_size": 100, "num_hidden_layers": 1}))
+            {"hidden_size": 32, "intermediate_size": 128, "num_hidden_layers": 1}))
         dest = Path(tmp) / "out-Tau"
         try:
             moefy(str(src), str(dest), 3, 1)
-        except ValueError:
-            pass
+        except NotImplementedError as error:
+            assert "trained routers" in str(error)
         else:
             raise AssertionError("accepted impossible partition")
         assert not dest.exists()                           # validation left no output

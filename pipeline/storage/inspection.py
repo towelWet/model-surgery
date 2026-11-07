@@ -3,7 +3,7 @@ import tomllib
 from pathlib import Path
 
 
-def inspect_store(store, verify=False):
+def inspect_store(store, verify=True):
     """Report store inventory; complete only with marker match AND zero defects."""
     store = Path(store).resolve()
     manifest = store / "manifest.toml"
@@ -17,7 +17,7 @@ def inspect_store(store, verify=False):
               "shards": len(plan.get("shards", [])), "tensors": len(plan.get("tensors", [])),
               "assets": len(plan.get("assets", [])),
               "payload_bytes": sum(t.get("nbytes", 0) for t in plan.get("tensors", [])),
-              "source_fingerprint": plan.get("source_fingerprint"),
+              "verified": False, "source_fingerprint": plan.get("source_fingerprint"),
               "guarantees": plan.get("guarantees", "lossless-bytes")}
     from .manifest.validate import validate_manifest
     try:
@@ -27,11 +27,12 @@ def inspect_store(store, verify=False):
     if verify and not report["errors"]:
         from .files.store_verify import verify_files
         report["missing"], report["corrupt"] = verify_files(store, plan)
+        report["verified"] = True
     if (store / "complete.toml").is_file() and not report["errors"]:
         from .transaction.completion import check_complete
         try:
             check_complete(store)
-            report["complete"] = not report["missing"] and not report["corrupt"]
+            report["complete"] = report["verified"] and not report["missing"] and not report["corrupt"]
         except ValueError:
             report["corrupt"].append("complete.toml")
     return report

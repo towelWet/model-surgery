@@ -26,7 +26,6 @@ from _apply_edit import apply_neuron_edit                          # weight patc
 from _direction import compute_direction                     # activation contrast
 
 args = parse_args()
-os.makedirs(args.dest)                                       # create output dir
 
 with open(os.path.join(args.src, "config.json")) as f:
     cfg = json.load(f)                                       # model config

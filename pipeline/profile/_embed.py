@@ -4,12 +4,13 @@
 import numpy as np
 
 from _api import _post
+from pipeline.runtime.settings import runtime_settings
 
 
 def embed(prompt):
     """Single-prompt embedding; returns float32 numpy array [hidden_size]."""
     resp = _post("embeddings", {
-        "model": "current",
+        "model": runtime_settings()["http"]["model"],
         "input": prompt,
     })
     return np.array(

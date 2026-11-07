@@ -3,11 +3,10 @@
 # Update comments with the code; do not strip them.
 import mlx.core as mx
 
-from ._shared import BITS, GROUP_SIZE
 from .materialize import materialize
 
 
-def requant_mx(w_np, gs=GROUP_SIZE, bits=BITS):
+def requant_mx(w_np, gs, bits):
     """Quantize host fp32 numpy back to materialized MLX affine triple."""
     w_q, scales, biases = mx.quantize(
         mx.array(w_np, dtype=mx.bfloat16), group_size=gs, bits=bits

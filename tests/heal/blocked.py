@@ -1,0 +1,34 @@
+"""The actual training entry refuses unsupported tool training before creating adapters or running commands."""
+import importlib
+import json
+import os
+from pathlib import Path
+import sys
+import tempfile
+from types import SimpleNamespace
+from unittest.mock import patch
+
+
+def test_training_capability_failure_has_no_side_effects():
+    folder = Path(__file__).resolve().parents[2] / "pipeline/heal/distill"
+    sys.path.insert(0, str(folder))
+    train = importlib.import_module("_train").train
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        config = root / "runtime.toml"
+        config.write_text('[runtime.capabilities]\nstructured_training = false\n')
+        data = root / "data.jsonl"
+        data.write_text(json.dumps({"messages": [{"role": "assistant", "content": None,
+            "tool_calls": [{"id": "fixture", "type": "function", "function": {
+                "name": "bash", "arguments": "{}"}}]}]}) + "\n")
+        args = SimpleNamespace(data=str(data), adapter_path=str(root / "adapter"))
+        with patch.dict(os.environ, {"SURGERY_RUNTIME_CONFIG": str(config)}, clear=True):
+            with patch("subprocess.run") as run:
+                try:
+                    train(args, str(root / "cache"))
+                except NotImplementedError:
+                    pass
+                else:
+                    raise AssertionError("unsupported tool training executed")
+                run.assert_not_called()
+        assert not (root / "adapter").exists()

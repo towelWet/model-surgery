@@ -34,6 +34,7 @@ results = {"target": [], "baseline": [], "direction": None}
 for label, prompts in [("target", target_prompts), ("baseline", base_prompts)]:
     for prompt in prompts:
         resp = probe_hidden(prompt, args.layer)
+        resp["prompt"] = prompt                          # heatmap labels rows by prompt
         results[label].append(resp)
         print(f"  {label}: {prompt[:60]}...")
 

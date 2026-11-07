@@ -1,11 +1,11 @@
-"""python -O CLI: non-Tau destination rejected before any source plan/hash; dry-run too."""
+"""python -O CLI accepts general destination names and rejects invalid source before writes."""
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
 
-def test_optimized_cli_tau_guard_precedes_source_plan():
+def test_optimized_cli_general_name_reaches_source_validation():
     root = Path(__file__).resolve().parents[2]
     with tempfile.TemporaryDirectory() as tmp:
         src = Path(tmp) / "src"
@@ -20,5 +20,5 @@ def test_optimized_cli_tau_guard_precedes_source_plan():
             assert result.returncode != 0
             assert not dest.exists()
             combined = result.stdout + result.stderr
-            assert "Tau" in combined                     # destination error, not shard error
-            assert "no safetensors shards" not in combined
+            assert "no safetensors shards" in combined
+            assert "destination name must include" not in combined

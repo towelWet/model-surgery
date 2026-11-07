@@ -3,6 +3,7 @@
 # Update comments with the code; do not strip them.
 #
 # Usage: python3 only_prune.py <src> <dest-Tau-...> "<spec>"
+import json
 import os
 import sys
 
@@ -15,17 +16,21 @@ from _tag_config import tag_config
 from _spec import format_spec, parse_spec
 from shard_io import copy_tokenizer, load_index, write_index
 from checkpoint.destination import validate_destination
+from _layer_prefix import decoder_layer_prefix
 
 if len(sys.argv) < 4:
     print('Usage: only_prune.py <src> <dest-Tau-...> "<spec>"')
     sys.exit(1)
 src, dest, spec = sys.argv[1], sys.argv[2], sys.argv[3]
 validate_destination(dest, sources=[src])                 # Tau name + overlap before any writes
-os.makedirs(dest)
 
 zero_layers = parse_spec(spec)
 idx = load_index(src)
 wmap = idx["weight_map"]
+with open(os.path.join(src, "config.json")) as f:
+    cfg = json.load(f)                                    # read-only; tag_config writes dest config
+prefix = decoder_layer_prefix(wmap, cfg.get("text_config", cfg).get("num_hidden_layers"))  # VLM/mtp tie-break
+os.makedirs(dest)
 shard_order = sorted(set(wmap.values()))
 shard_cache = {}
 by_shard = {}
@@ -38,7 +43,7 @@ tag_config(src, dest, zero_layers)                   # config.json + mlp_zeroed_
 for shard in shard_order:
     keys = by_shard.get(shard, [])
     print(f"shard {shard} ({len(keys)} tensors)...")
-    out = process_shard(src, shard, keys, zero_layers, shard_cache)
+    out = process_shard(src, shard, keys, zero_layers, shard_cache, prefix)
     mx.save_safetensors(os.path.join(dest, shard), out)
 
 write_index(dest, idx.get("metadata", {}), dict(wmap))

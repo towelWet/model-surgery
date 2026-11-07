@@ -27,7 +27,6 @@ p.add_argument("--alpha", type=float, default=1.0)
 args = p.parse_args()
 
 validate_destination(args.dest, sources=[args.src])        # before mkdir and embed calls
-os.makedirs(args.dest)
 
 print("Probing refusal direction via API embeddings...")
 harmful_vecs = np.stack([embed(pr) for pr in HARMFUL])

@@ -4,8 +4,8 @@
 #
 # Replaces block_similarity.py, whose quantized-weight-norm proxy returned an
 # identical 1.92e+16 for every group and therefore ranked nothing at all.
-# BLOCKED 2026-11-06: needs an tensor-array per-layer residual-state route —
-# _hidden.capture() is a fail-closed stub (mlx_lm banned); not runnable today.
+# 2026-11-07: runs against the runtime probe route /v1/internals/layer_distance
+# (server started with its probe env gate on); no local model load, no mlx_lm.
 #
 # Cut candidates align to full_attention_interval so the repeating
 # (linear,linear,linear,full) group pattern survives removal intact.
@@ -15,7 +15,6 @@
 # Usage: python3 distance.py <model_dir> [--blocks 4,8,16] [--limit N]
 import argparse, json, os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))  # profile/
-from _mlx_load import load as mlx_load
 from calib._core import CALIB
 from _sum_distances import sum_distances
 from _rank_blocks import rank_blocks
@@ -37,11 +36,9 @@ n_layers = cfg["num_hidden_layers"]
 stride   = cfg.get("full_attention_interval", 1)        # hybrid attn: keep (lin,lin,lin,full) groups; else any layer
 starts   = {b: list(range(0, n_layers - b + 1, stride)) for b in BLOCKS}
 
-print(f"Loading {a.model} ({n_layers} layers) ...")
-model, tok = mlx_load(a.model)
-
-totals = sum_distances(model, tok, PROMPTS, starts, a.max_tokens)
-result = rank_blocks(a.model, n_layers, len(PROMPTS), totals)
+print(f"Scoring {a.model} ({n_layers} layers) via runtime probe route ...")
+totals, n_scored = sum_distances(PROMPTS, starts, a.max_tokens)
+result = rank_blocks(a.model, n_layers, n_scored, totals)
 
 out = a.out or os.path.join(os.path.dirname(os.path.abspath(__file__)), "block_distance.json")
 with open(out, "w") as f:

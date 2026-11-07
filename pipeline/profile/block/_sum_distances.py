@@ -1,21 +1,21 @@
-# _sum_distances.py — per prompt: capture hidden states once, add angular distance for every block cut.
+# _sum_distances.py — summed PruneMe angular distance per block cut, computed by the runtime.
 # NEVER DELETE COMMENTS — explain every non-obvious line.
 # Update comments with the code; do not strip them.
-import mlx.core as mx
+#
+# POST /v1/internals/layer_distance (runtime probe route, env-gated on the server). Hidden
+# states stay server-side; only one summed float per cut comes back, in request order.
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # profile/ (_api)
+from _api import _post
 
-from _angular import angular_distance
-from _hidden import capture
 
-
-def sum_distances(model, tok, prompts, starts, max_tokens):
-    totals = {b: {s: 0.0 for s in ss} for b, ss in starts.items()}
-    for n, prompt in enumerate(prompts, 1):
-        ids = mx.array(tok.encode(prompt)[:max_tokens]).reshape(1, -1)  # truncate: caps peak RAM
-        states = capture(model, ids)                        # reused across every block size
-        for b, ss in starts.items():
-            for s in ss:
-                totals[b][s] += angular_distance(states[s], states[s + b])  # input vs output of cut block
-        del states
-        mx.clear_cache()                                    # release Metal buffers between prompts
-        print(f"  [{n}/{len(prompts)}] {prompt[:46]}")
-    return totals
+def sum_distances(prompts, starts, max_tokens):
+    cuts = [[s, b] for b, ss in starts.items() for s in ss]           # flat [start, size] list
+    reply = _post("internals/layer_distance", {"prompts": prompts, "cuts": cuts, "max_tokens": max_tokens})
+    if len(reply["totals"]) != len(cuts) or any(v is None for v in reply["totals"]):
+        raise ValueError("runtime returned missing or non-finite distances")
+    totals = {b: {} for b in starts}
+    for (s, b), v in zip(cuts, reply["totals"]):
+        totals[b][s] = v
+    return totals, reply["prompts"]                                   # server count: short prompts skipped

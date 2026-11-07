@@ -1,39 +1,49 @@
-# Code audit: verified changes and limits
+# Audit repairs and acceptance limits
 
-Objective: improve the model-surgery CLI and its evidence checks before preparing
-the local X preview. These changes do not establish a working full surgery campaign.
+Objective: prevent invalid checkpoint writes and unsupported runtime/training claims.
+Publication remains on hold. No source checkpoint, deployed runtime or trained adapter
+was changed by these repairs.
 
-Fixed:
+## Repaired
 
-- Empty/report-only gate rules could authorize promotion without blocking evidence.
-- Reports lacked a source fingerprint and comparable case-count checks.
-- TOML strings were unescaped and float metrics were rounded to four decimals.
-- One tool case was duplicated; another expected a tool absent from its schema.
-- Origin sampling named fixed Qwen tensors/layers and ignored per-prefix quantization.
-- BF16 row decoding discarded subnormals and mishandled special values.
-- Depth pruning used an optimizable destination assertion, accepted invalid removal
-  sets, and required optional `layer_types` configuration.
+- MLX affine edits resolve per-module bits/group size, dequantize before editing,
+  and regenerate packed weights, scales and biases together, including cross-shard triples.
+- Output-space projection uses matrix rows and validates finite, nonzero directions.
+- Block namespaces are discovered; ambiguous indexed stacks fail explicitly.
+- Expert pruning validates fractions, permutations, bounds and complete MoE-layer coverage.
+- Storage preserves every regular checkpoint asset recursively, verifies completion
+  by default, detects inventory drift, and fails recovery for incomplete stores.
+- Neuron edits, projection, expert pruning and DARE stream output groups. Input caches
+  retain one shard per source; working memory still depends on shard/matrix size.
+- DARE uses inverse-probability rescaling and accurate method metadata; TIES is absent.
+- Corpus rows use structured tool calls and response IDs; training rejects legacy textual
+  calls, unfilled rows and unsupported structured-training capability declarations.
+- Runtime commands/endpoints/private aliases use hot-loaded TOML. Public code does not
+  depend on a private backend name. Publication scans configured private literals/digests.
+- Doctor counts nested methods/functions and checks tests as well as pipeline code.
+- 2026-11-07 review: block discovery breaks text/vision/mtp ties by config `num_hidden_layers`
+  (exact 0..N-1 coverage; equal depths still refuse), so VLM checkpoints resolve their text stack.
+- 2026-11-07 review: training validation refuses `<tool_call>` chat-template text in assistant content.
+- 2026-11-07 review: streamed writes pack groups into 2 GiB shards (`checkpoint/flush_shard.py`);
+  previously one file per tensor group (1066 files for a 6-shard 35B-A3B source).
 
-Extensions:
+## Evidence scope
 
-- `ms inspect MODEL [--out summary.toml]`: header-only checkpoint inspection;
-  supports single-file/indexed layouts, checks byte bounds/index agreement.
-- `ms cases [suite ...]`: offline case validation, counts and fingerprint.
-- `ms list [stage ...] --search TEXT`: searchable, filesystem-discovered inventory.
-- Bounded, discovered tensor sampling in the origin similarity tool.
+Tests exercise real CLI checkpoint writes with small synthetic MLX fixtures: 2/4/8-bit
+neuron edits, mixed-bit DARE, expert pruning and projection, plus byte-identical storage
+round trips, interruption/corruption refusal, private-name scanning and renamed executables.
+These are structural/functional fixtures, not real-model quality or peak-memory proof.
+The current publisher file selection and all six included images were reviewed for privacy.
+Raw test/doctor/privacy reports remain in the private audit evidence directory.
 
-Validation includes real depth-pruning CLI execution under `python -O` on a tiny
-synthetic checkpoint, checking surviving tensor bytes. Fixtures are tests, not model
-capability or profitability evidence. Full inference and healing were not run.
+## Explicit blocks
 
-Remaining limitations:
+Dense-to-MoE conversion/config writing is disabled: trained routing and loader support
+are unproven. Required profiling routes remain unavailable. Structured training is disabled
+by default: the native dataset loader omits top-level tool schemas; no compatible trainer
+was installed or run. Existing generated corpora/adapters remain unvalidated evidence.
+Code/rev token grading and top-k KL remain diagnostic-only and cannot authorize promotion.
+GGUF editing/export, PyTorch editing and dynamic runtime expert loading remain absent.
 
-- Per-layer residual/MLP taps and teacher-forced layer-skip profiling remain disabled;
-  tensor-array instrumentation is still required. Doctor green does not prove profiling.
-- Code/rev use token matching; KL uses renormalized top-k heads. Their reports are now
-  explicitly diagnostic-only and cannot authorize promotion.
-- Model labels in eval reports are caller supplied, not verified server identities.
-- The archived SLAB baseline index references missing `optiq/optiq_vision.safetensors`;
-  inspection correctly refuses it. Existing weights and indexes were not modified.
-- Neuron editing, healing and other surgery paths were not end-to-end validated here.
-- A source fingerprint establishes comparability, not authenticity of supplied reports.
+[MLX dequantization contract](https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.dequantize.html)
+and [TIES definition](https://arxiv.org/abs/2306.01708) informed the math review.

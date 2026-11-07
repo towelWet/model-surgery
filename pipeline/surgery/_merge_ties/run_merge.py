@@ -9,12 +9,15 @@ import numpy as np
 
 from ._shared import copy_tokenizer, load_index, write_index
 from .merge_tensors import merge_tensors
-from .verify_configs import verify_configs
-from .write_merged_config import write_merged_config
+from .config import merged_configuration
+from checkpoint.destination import validate_destination
+from .merge_preflight import merge_preflight
+from checkpoint.write_groups import write_groups
 
 
 def run_merge(src_a, src_b, dest, density, lam, weight_b, seed, bf16_only):
-    verify_configs(src_a, src_b)
+    validate_destination(dest, sources=[src_a, src_b])
+    merge_preflight(src_a, src_b, density, lam, weight_b)
     rng = np.random.default_rng(seed)
     idx_a = load_index(src_a)
     idx_b = load_index(src_b)
@@ -27,23 +30,16 @@ def run_merge(src_a, src_b, dest, density, lam, weight_b, seed, bf16_only):
     if only_a:
         print(f"  {len(only_a)} src_a-only keys (e.g. vision) copied unchanged from base")
 
-    copy_tokenizer(src_a, dest)
-    write_merged_config(src_a, dest)                       # base config, tool keys dropped
-
-    out = merge_tensors(
+    groups = merge_tensors(
         common, only_a, wmap_a, wmap_b, src_a, src_b, {}, {}, None,
         rng, density, weight_b, lam, bf16_only,
     )
-    shard_name = "model.safetensors"
-    mx.save_safetensors(os.path.join(dest, shard_name), out)
-    new_wmap = {k: shard_name for k in out}
     meta = dict(idx_a.get("metadata", {}))
-    meta["merge_method"] = "dare_ties"
+    meta["merge_method"] = "dare_task_arithmetic"
     meta["merge_density"] = density
     meta["merge_base"] = os.path.basename(src_a)
     meta["merge_other"] = os.path.basename(src_b)
-    write_index(dest, meta, new_wmap)
+    cfg = merged_configuration(src_a, bf16_only)
+    write_groups(src_a, dest, groups, {**idx_a, "metadata": meta}, cfg)
     print(f"\nDone -> {dest}")
-    print(f"  method: dare_ties  density={density}  lambda={lam}  weight_b={weight_b}")
-    if bf16_only:
-        print("  NOTE: bf16 weights — re-quant with: python3 export/mlx/convert.py <dest> <dest-Tau-3bit>")
+    print(f"  method: dare_task_arithmetic  density={density}  lambda={lam}  weight_b={weight_b}")

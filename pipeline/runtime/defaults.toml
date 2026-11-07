@@ -1,0 +1,31 @@
+# Public protocol defaults. Workstation commands and private aliases belong in local.toml.
+[http]
+base_url = "http://localhost:{port}/v1"
+port = 8765
+model = "current"
+model_path = ""
+timeout_seconds = 180
+
+[aliases]
+base_url = ["SURGERY_API_URL"]
+port = ["SURGERY_API_PORT", "TARR_EVAL_PORT"]
+model = ["SURGERY_API_MODEL"]
+model_path = ["SURGERY_MODEL"]
+
+[command_environment]
+train = ["SURGERY_TRAIN_COMMAND", "TENSOR_ARRAY_TRAIN"]
+reload = ["SURGERY_RELOAD_COMMAND"]
+server = ["SURGERY_SERVER_COMMAND", "TENSOR_ARRAY_SERVER"]
+assistant = ["SURGERY_ASSISTANT_COMMAND"]
+
+[commands.train]
+candidates = [["tensor-array-train"]]
+
+[commands.server]
+candidates = [["inferserve-model"]]
+
+[commands.assistant]
+candidates = [["harn"]]
+
+[capabilities]
+structured_training = false

@@ -8,17 +8,20 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))              # profile/ (_mlx_load)
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ablation"))  # scorer lives in profile/ablation/
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+from pipeline.runtime.settings import runtime_settings
 from _layer_ablation import layer_ablation               # not `_score`: profile/depth/_score.py shadows it
 
-_MODEL_DIR = os.environ.get("MLX_MAGIC_MODEL", "")
+
 
 
 def handle_layer_ablation(body: dict) -> dict:
     """OpenAI-style extension: prompts + optional zero_layers list."""
-    if not _MODEL_DIR:
-        raise RuntimeError("set MLX_MAGIC_MODEL to loaded checkpoint path")
+    model_dir = runtime_settings()["http"]["model_path"]
+    if not model_dir:
+        raise RuntimeError("configure the runtime model_path or SURGERY_MODEL")
     prompts = body.get("prompts") or []
     if not prompts:
         raise ValueError("prompts required")
     zero = body.get("zero_layers")
-    return layer_ablation(_MODEL_DIR, prompts, zero_layers=zero)
+    return layer_ablation(model_dir, prompts, zero_layers=zero)

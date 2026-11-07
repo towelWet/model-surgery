@@ -1,11 +1,12 @@
-# _train_bin.py — resolve the tensor-array-train binary (never mlx_lm).
+# Compatibility shim: resolve the configured trainer without depending on its product name.
 import os
-import shutil
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from pipeline.runtime.command import runtime_command
 
 
 def train_bin():
-    """TENSOR_ARRAY_TRAIN env first, then PATH lookup; clear error if absent."""
-    path = os.environ.get("TENSOR_ARRAY_TRAIN") or shutil.which("tensor-array-train")
-    if not path:
-        raise FileNotFoundError("tensor-array-train not found (set TENSOR_ARRAY_TRAIN or add to PATH)")
-    return path
+    command = runtime_command("train")
+    if len(command) != 1:
+        raise ValueError("train_bin requires a single executable; use runtime_command for wrapper arguments")
+    return command[0]

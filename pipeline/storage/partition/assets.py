@@ -1,19 +1,16 @@
-"""Ancillary asset plan: config.json, weight index, discovered tokenizer files + drift stamps."""
+"""Preserve every checkpoint file not already represented as a tensor shard."""
 from pathlib import Path
-from pipeline.surgery.shard.tokenizer.discover import discover_assets
+from .inventory import checkpoint_files
 from ..files.member import safe_member
 from ..hashes.digest import file_sha256
 
 
-def plan_assets(source):
+def plan_assets(source, shards=()):
     source = Path(source)
-    names = ["config.json", "model.safetensors.index.json"]
-    names += [str(p) for p in discover_assets(source)]
+    names = set(checkpoint_files(source)) - set(shards)
     assets, hashes, stamps = [], [], {}
     for rel in sorted(set(names)):
         path = safe_member(source, rel)
-        if not path.is_file():
-            continue                                        # optional assets may be absent
         stat = path.stat()
         assets.append({"path": rel, "file": f"assets/{rel}",
                        "sha256": file_sha256(path), "size": stat.st_size})

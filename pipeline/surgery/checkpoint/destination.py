@@ -3,10 +3,10 @@ from pathlib import Path
 
 
 def validate_destination(destination, sources=(), allow_existing=False):
-    """Resolve dest, require Tau basename, reject exists/overlap/missing sources."""
+    """Resolve any named checkpoint; reject existing paths and source overlap."""
     raw = Path(destination)
-    if "Tau" not in raw.name:
-        raise ValueError(f"destination name must include Tau: {raw.name}")
+    if not str(destination).strip() or raw.name in ("", ".", ".."):
+        raise ValueError("destination requires a nonempty directory name")
     if raw.is_symlink():                                     # link occupies the dir entry: same class as exists
         raise FileExistsError(f"destination is a symlink: {raw}")
     if raw.exists():

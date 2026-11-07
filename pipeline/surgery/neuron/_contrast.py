@@ -15,8 +15,10 @@ def compute_contrast(target_records, baseline_records, top_n=10):
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "profile", "heatmap"))  # _parse lives in profile/heatmap/
     from _parse import parse_layers                  # reuse layer parser
 
-    t_layers = parse_layers(target_records)
-    b_layers = parse_layers(baseline_records)
+    if type(top_n) is not int or top_n < 1:
+        raise ValueError("top_n must be a positive integer")
+    t_layers = parse_layers(target_records, absolute=False)
+    b_layers = parse_layers(baseline_records, absolute=False)
 
     candidates = []
     for tl in t_layers:
@@ -24,13 +26,15 @@ def compute_contrast(target_records, baseline_records, top_n=10):
         bl = next((b for b in b_layers if b["layer"] == li), None)
         if not bl:
             continue
-        for ni in range(min(len(tl["mean_abs"]), len(bl["mean_abs"]))):
-            diff = tl["mean_abs"][ni] - bl["mean_abs"][ni]   # signed contrast
+        if len(tl["mean"]) != len(bl["mean"]):
+            raise ValueError(f"activation width mismatch in layer {li}")
+        for ni in range(len(tl["mean"])):
+            diff = tl["mean"][ni] - bl["mean"][ni]
             candidates.append({
                 "layer": li, "neuron": ni,
                 "contrast": diff,
-                "target_mean": tl["mean_abs"][ni],
-                "baseline_mean": bl["mean_abs"][ni],
+                "target_mean": tl["mean"][ni],
+                "baseline_mean": bl["mean"][ni],
             })
 
     candidates.sort(key=lambda c: abs(c["contrast"]), reverse=True)

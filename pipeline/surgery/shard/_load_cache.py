@@ -8,6 +8,7 @@ import mlx.core as mx
 def load_shard_cache(model_dir, shard_filename, cache):
     """Load shard into cache if not already present; return weight dict."""
     if shard_filename not in cache:
+        cache.clear()                                    # retain at most one source shard, not the full model
         cache[shard_filename] = mx.load(
             os.path.join(model_dir, shard_filename)
         )                                                # mx.load -> {key: mx.array}

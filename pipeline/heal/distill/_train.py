@@ -6,13 +6,21 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))  # heal/ helpers
-from _train_bin import train_bin                          # env/PATH tensor-array-train (never mlx_lm)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
+from pipeline.runtime.command import runtime_command
+from pipeline.runtime.environment import runtime_environment
+from pipeline.runtime.require import require_capability
+from validate_data import validate_training_data
 
 
 def train(args, cache):
+    evidence = validate_training_data(args.data)
+    if evidence["structured_calls"]:
+        require_capability("structured_training")
+    command = runtime_command("train")                                  # refuse missing trainer before creating output
     os.makedirs(args.adapter_path, exist_ok=True)
     cmd = [
-        train_bin(), "train",
+        *command, "train",
         "--model", args.student,
         "--data", args.data,
         "--out", args.adapter_path,
@@ -26,6 +34,6 @@ def train(args, cache):
         cmd += ["--teacher-cache", cache]                   # CE + top-32 KL
     else:
         print(f"No teacher cache at {cache}; CE-only SFT. Run cache_teacher_logits.py first.")
-    print("Train:", " ".join(cmd))
-    subprocess.run(cmd, check=True)
+    print("Starting configured training command.")
+    subprocess.run(cmd, env=runtime_environment(), check=True)
     print(f"\nAdapter -> {args.adapter_path}")

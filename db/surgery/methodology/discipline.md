@@ -9,16 +9,14 @@ gen_corpus  →  cache_teacher_logits  →  train_lora_distill  →  fuse_adapte
 ```
 
 Unload 27B before teacher cache; restore Tau-56L on `:8765` after. Never hold both in RAM — cache is two-pass.
-Production: `mlx_lm lora`/`fuse` (`heal/BALANCED_HEAL.md`); local-only history: db/rejected/mlx-lm-heal/train_lora_distill.py is `mlx_lm lora`, not tensor-array-train.
+Use the configured local training command; historical rejected adapters are not validated training evidence.
 
 `<spec>` accepts non-contiguous removals: `"4-15,40-43"`.
 
 ## NAMING (non-negotiable)
 
-Every checkpoint — prune, merge, heal, fuse, requant, abliterate — **must** include `Tau`
-in the directory or filename.
-Examples: `Qwen3.8-27B-Tau-56L-3bit`, `Qwen3.5-4B-Tau-Huihui-Qwopus-TIES-4bit`.
-Do not replace existing `Tau-56L` names. Do not rename historical rows in `db/<family>/<ver>/<size>/results.toml`.
+Checkpoint destinations may use any nonempty name. Existing paths, symlinks and source
+overlap are refused before writing. Existing Tau checkpoint names remain unchanged.
 
 ## MEMORY
 

@@ -20,11 +20,13 @@ def plan_split(source):
         tensor_index(source)
     dtype_map = dtype_bytes()
     shards, tensors, shard_hashes, shard_stamps = plan_shards(source, rels, dtype_map)
-    assets, asset_hashes, asset_stamps = plan_assets(source)
+    assets, asset_hashes, asset_stamps = plan_assets(source, rels)
     plan = {"schema_version": 1, "kind": "modular-safetensors", "guarantees": "lossless-bytes",
             "source_fingerprint": fingerprint(shard_hashes + asset_hashes),
             "shards": shards, "tensors": tensors, "assets": assets,
             "_stamps": {**shard_stamps, **asset_stamps}}
+    from .manifest.validate import validate_manifest
+    validate_manifest(plan, source)                          # reject collisions before destination writes
     manifest_len = len(manifest_text(plan).encode())
     plan["required_bytes"] = (sum(tensor_file_size(t) for t in tensors)
                               + sum(s["_header_bytes"] for s in shards)

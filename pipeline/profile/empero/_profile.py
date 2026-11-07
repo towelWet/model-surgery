@@ -25,7 +25,7 @@ def empero_profile(model_dir, experts=64):
     single_file = not os.path.exists(idx_path)
     keys = list((json.loads(open(idx_path).read()) if not single_file
                  else synthesize_index(model_dir))["weight_map"])
-    prefix = decoder_layer_prefix(keys)
+    prefix = decoder_layer_prefix(keys, tc.get("num_hidden_layers"))  # VLM text stack by layer count
     header = safetensors_header(os.path.join(model_dir, "model.safetensors")) if single_file else {}
     return {
         "model_dir": model_dir,

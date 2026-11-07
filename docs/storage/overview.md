@@ -11,13 +11,18 @@ storage moves bytes, never interprets weights.
   headers under `headers/<sha256(path)>.bin`, ancillary bytes under `assets/`.
 - `reassemble.py` `reassemble_checkpoint(store, dest, resume)` — byte-identical
   rebuild: stored raw headers + payloads in original offset order.
-- `inspection.py` `inspect_store(store, verify)` — manifest inventory; `--verify`
-  rehashes every file. `ms weights split|join|inspect|recover` CLI verbs.
+- `inspection.py` `inspect_store(store, verify)` — verifies every recorded file by
+  default. `--inventory-only` skips hashes and never reports completion.
+  `ms weights split|join|inspect|recover` CLI verbs; incomplete recovery exits nonzero.
 
 ## Guarantee class
 
 `lossless-bytes` only: split+join restores identical shard/asset bytes proven by
-sha256. This says nothing about inference equivalence, model quality, or memory
+sha256. Every regular non-shard file is preserved recursively, including multimodal
+assets, custom loader code, hidden files and unindexed auxiliary weights. Symlinks,
+special files and reserved transaction-name collisions are refused before writes.
+Empty directories and filesystem metadata are outside this byte contract.
+This says nothing about inference equivalence, model quality, or memory
 reduction. Shape equality never implies functional compatibility.
 Markers (transaction/manifest/complete) are integrity checks, not security
 boundaries. The store format does not establish runtime load support; loading
@@ -28,7 +33,7 @@ stays owned by consumer runtimes such as tensor-array.
 transaction.toml first, manifest.toml after all hashes verify, complete.toml
 LAST (manifest sha256). Interrupted stores stay incomplete; consumers refuse them.
 `--resume` requires matching operation+fingerprint; damaged partials are never
-overwritten. Destinations need `Tau` in the name; overlap with sources refused.
+overwritten. Destinations accept general names; overlap with sources is refused.
 
 ## Not implemented (proposal only)
 

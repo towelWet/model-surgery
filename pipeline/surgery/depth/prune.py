@@ -30,7 +30,7 @@ with open(os.path.join(src, "config.json")) as f:
 idx = load_index(src)
 wmap = idx["weight_map"]
 shard_order = sorted(set(wmap.values()))
-surviving = surviving_triples(wmap, shard_order, remove_set)
+surviving = surviving_triples(wmap, shard_order, remove_set, cfg.get("text_config", cfg)["num_hidden_layers"] + len(remove_set))  # pre-removal count
 new_wmap = shard_map_for_survivors(surviving, len(shard_order))
 
 os.makedirs(dest)

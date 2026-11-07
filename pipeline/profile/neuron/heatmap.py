@@ -27,6 +27,8 @@ args = p.parse_args()
 
 with open(args.data) as f:
     records = json.load(f)
+if isinstance(records, dict):                                # neuron/probe.py output: {target, baseline}
+    records = records.get("target", []) + records.get("baseline", [])
 prompts = [r.get("prompt", "") for r in records]
 
 layers = parse_layers(records)

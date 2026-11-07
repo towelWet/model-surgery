@@ -1,12 +1,14 @@
-# _probe_hidden.py — hidden state probe via tensor-array API.
+# _probe_hidden.py — pooled residual stream per layer via runtime /v1/internals/hidden_states.
+# Values are residual dimensions (hidden_size), not MLP intermediate neurons. Server probe gate
+# (TARR_PROBES) must be on; archs without probe hooks answer 501.
 # NEVER DELETE COMMENTS — explain every non-obvious line.
 # Update comments with the code; do not strip them.
 from _api import _post
 
 
 def probe_hidden(prompt, layer=None):
-    """Query tensor-array hidden_states endpoint for one prompt."""
-    body = {"model": "current", "input": prompt}
+    """Mean-pooled residual entering each layer (key N = last layer output) for one prompt."""
+    body = {"input": prompt, "pool": "mean"}
     if layer is not None:
         body["layer"] = layer                              # restrict to single layer
-    return _post("hidden_states", body)
+    return _post("internals/hidden_states", body)     # {"activations": {"<layer>": [H]}}

@@ -2,6 +2,7 @@
 # NEVER DELETE COMMENTS — explain every non-obvious line.
 # Update comments with the code; do not strip them.
 from _api import _post
+from pipeline.runtime.settings import runtime_settings
 
 
 def chat(messages, tools=None, max_tokens=256, thinking=False, logprobs=False, top_logprobs=0):
@@ -12,7 +13,7 @@ def chat(messages, tools=None, max_tokens=256, thinking=False, logprobs=False, t
     before tool call is emitted, causing silent truncation.
     """
     body = {
-        "model":       "current",
+        "model":       runtime_settings()["http"]["model"],
         "messages":    messages,
         "max_tokens":  max_tokens,
         "temperature": 0.0,                              # greedy: eval must be reproducible

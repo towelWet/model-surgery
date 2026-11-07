@@ -3,14 +3,14 @@
 # Update comments with the code; do not strip them.
 import re
 
-from _layer_prefix import DECODER_PREFIXES   # Tau + Empero nested VLM prefixes
+from _layer_prefix import decoder_layer_prefix
 from _shard_name import shard_name           # re-export: many callers import it from _keys
 
 
-def remap_key(key, remove_set):
+def remap_key(key, remove_set, prefix=None):
     """Remap layer index in a weight key; return None if layer is in remove_set."""
-    prefix = next((p for p in DECODER_PREFIXES if key.startswith(p)), None)
-    if prefix is None:
+    prefix = prefix or decoder_layer_prefix([key])
+    if not key.startswith(prefix):
         return key                           # non-decoder key (embed, MTP, vision) passes through
     m = re.match(r"^(\d+)(\..+)$", key[len(prefix):])
     if not m:

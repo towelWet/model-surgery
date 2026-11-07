@@ -13,13 +13,14 @@ def build_rows(rng, n_tool, n_gen, prompts_only, chat_fn=None):
         user, tools = tool_request(rng)
         messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}]
         if prompts_only:
-            assistant = stub_tool_response("tool", user)
+            response = {"role": "assistant", "content": None,
+                        "tool_calls": stub_tool_response("tool", user)}
         else:
             resp = chat_fn(messages, tools=tools, max_tokens=256)
-            assistant = resp.get("content", "")
+            response = {"role": "assistant", "content": resp.get("content")}
             if resp.get("tool_calls"):
-                assistant = json.dumps(resp["tool_calls"])
-        messages.append({"role": "assistant", "content": assistant})
+                response["tool_calls"] = resp["tool_calls"]
+        messages.append(response)
         rows.append({"messages": messages, "tools": tools, "teacher_fill": prompts_only})
         if i % 200 == 0:
             print(f"  tool {i}/{n_tool}")

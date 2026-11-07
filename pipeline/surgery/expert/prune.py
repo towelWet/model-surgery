@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))   # surgery/ (
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))      # expert/ siblings
 from _prune_core import prune_experts
 from _removal_plan import removal_plan
+from check_plan import validate_pruning_plan
 from shard_io import copy_tokenizer
 from checkpoint.destination import validate_destination
 
@@ -33,12 +34,11 @@ with open(os.path.join(args.src, "config.json")) as f:
 tc = cfg.get("text_config", cfg)
 E = tc["num_experts"]
 plan, new_E = removal_plan(usage, E, args.remove_frac)
+validate_pruning_plan(args.src, plan, E)
 K = args.top_k or tc.get("num_experts_per_tok")
 if type(K) is not int or not 0 < K <= new_E:
     raise ValueError(f"top-k {K} must be an integer in 1..{new_E} remaining experts")
 tc["num_experts"], tc["num_experts_per_tok"] = new_E, K
-os.makedirs(args.dest)
-copy_tokenizer(args.src, args.dest)
 print(f"Pruning {E} -> {new_E} experts/layer on {len(plan)} layers  top-K: {K}")
 prune_experts(args.src, args.dest, plan, cfg, E)
 print(f"\nDone -> {args.dest}  experts: {E} -> {new_E}")

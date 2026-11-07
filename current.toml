@@ -10,7 +10,7 @@ training = "Training backend owns expert specialization and selective healing"
 formats = "Safetensors first; GGUF requires separate real parser/writer adapter"
 
 [authorization]
-github_recreation = "Held: no new publication; real-model validation and unsupported capabilities remain blocked"
+github_recreation = "Published 2026-11-07 commit dd9bde08 (659 files, privacy gate 0 blocking); real-model validation still unproven"
 x_publication = "Not authorized"
 publication_gate = "Expanded capabilities must match implementation and evidence"
 
@@ -41,5 +41,5 @@ open_risk = "Resolved 2026-11-07: DARE now float32 in place (~2.25x one tensor e
 inspect = "Seam checked 2026-11-07: both runtime trees serve only /v1/models, chat/completions, embeddings, audio/transcriptions; residual, MLP-tap, layer-skip routes absent"
 route_work = "2026-11-07: /v1/layer_ablation + /v1/internals/layer_distance added in both runtime trees (probe gate env); live-tested on AIMER-64e via private runtime build; not installed; MLP tap skipped (moefy disabled)"
 preserve = "Keep existing user changes, immutable history and unrelated processes"
-publish = "On hold; nothing uploaded, recreated or posted"
-preview = "Refresh animated X draft after publication verification; never post"
+publish = "GitHub updated 2026-11-07 (dd9bde08); X post never posted"
+preview = "X draft refreshed 2026-11-07 to match dd9bde08; 3 drafts verified in app; never posted"

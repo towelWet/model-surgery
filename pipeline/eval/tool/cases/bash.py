@@ -1,0 +1,35 @@
+# bash.py — single-turn prompts where bash is right call; data only.
+# NEVER DELETE COMMENTS — explain every non-obvious line.
+# Update comments with the code; do not strip them.
+
+CASES = [
+    ("Run ls -la on my home directory.",                 "bash",       "command"),
+    ("Execute uname -a to show kernel info.",            "bash",       "command"),
+    ("Use df -h to report disk space.",                  "bash",       "command"),
+    ("Execute date.",                                       "bash",       "command"),
+    ("List open files with lsof summary.",                  "bash",       "command"),
+    ("Count files in /usr/bin.",                            "bash",       "command"),
+    ("List top 10 processes by CPU.",                       "bash",       "command"),
+    ("Run ls /etc | head.",                                 "bash",       "command"),
+    ("Show kernel version with uname -r.",                  "bash",       "command"),
+    ("Run system_profiler SPHardwareDataType briefly.",     "bash",       "command"),
+    ("How many CPUs does this machine have?", "bash",       "command"),
+    ("Run hostname.",                                       "bash",       "command"),
+    ("Run sw_vers.",                                        "bash",       "command"),
+    ("Run id.",                                             "bash",       "command"),
+    ("Run sysctl hw.memsize.",                              "bash",       "command"),
+    ("Execute echo $SHELL.",                                "bash",       "command"),
+    ("Run find /tmp -maxdepth 1 -type f.",                 "bash",       "command"),
+    ("Show last 5 lines of history.",                       "bash",       "command"),
+    ("List files in /tmp",                    "bash",       "command"),
+    ("Show running processes",                "bash",       "command"),
+    ("Kill process with PID 1234",            "bash",       "command"),
+    ("Run whoami.",                                         "bash",       "command"),
+    ("Show environment with printenv.",                     "bash",       "command"),
+    ("Check listening ports with netstat.",                 "bash",       "command"),
+    ("Show disk usage of / with du -sh.",                   "bash",       "command"),
+    ("Show current directory with pwd.",                    "bash",       "command"),
+    ("Run wc -l /etc/hosts.",                               "bash",       "command"),
+    ("Check if docker is installed.",                       "bash",       "command"),
+    ("Run which python3.",                                  "bash",       "command"),
+]

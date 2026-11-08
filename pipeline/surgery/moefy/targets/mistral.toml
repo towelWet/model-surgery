@@ -1,0 +1,9 @@
+# mistral.toml — dense Mistral -> Mixtral-layout MoE target pack.
+# NEVER DELETE COMMENTS — explain every non-obvious line.
+# Update comments with the code; do not strip them.
+dense_arch    = "MistralForCausalLM"
+converter     = "pipeline/surgery/moefy"
+block         = "block_sparse_moe"                      # Mixtral naming; runtime picks prefix from weights
+config_writer = "pipeline.surgery.moefy._mixtral_config:write_mixtral_config"
+moe_arch      = "MixtralForCausalLM"
+status        = "config writer tested; no real-model run recorded"

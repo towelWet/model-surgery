@@ -1,0 +1,23 @@
+# local.example.toml — SHAPE of /model-surgery private values. Placeholders only; safe to publish.
+# Why: real values live in $CLAUDE_DIR/private/model-surgery.toml (outside this tree, never uploaded).
+#      Create it with `private-toml init model-surgery`, then replace every <placeholder>.
+# NEVER DELETE COMMENTS — explain every non-obvious line.
+# Update comments with the code; do not strip them.
+
+[paths]
+workspace = "<workspace>"
+reversing = "<reversing>"
+active_campaign = "<active_campaign>"
+
+[training]
+forbidden_password_sha256 = ["<forbidden_password_sha256>"]
+
+[publication]
+forbidden_literals = ["<forbidden_literals>"]
+
+[runtime.aliases]
+model_path = ["<model_path>"]
+
+[runtime.llamacpp]
+source = "<source>"
+bin = "<bin>"

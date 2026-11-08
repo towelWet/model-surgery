@@ -1,0 +1,10 @@
+# qwen3.toml — dense Qwen3 -> Qwen3-MoE target pack for `ms moeify`.
+# NEVER DELETE COMMENTS — explain every non-obvious line.
+# Update comments with the code; do not strip them.
+# Hot-loadable: one *.toml per dense arch; _target_packs.py discovers them, zero code edits.
+dense_arch    = "Qwen3ForCausalLM"                      # config.json architectures[0] this pack accepts
+converter     = "pipeline/surgery/moefy"                # repo-relative dir; <converter>/entry.py runs it
+block         = "mlp"                                   # router at <block>.gate, experts at <block>.switch_mlp.*
+config_writer = "pipeline.surgery.moefy.moe._config:write_moe_config"   # absolute module:function, writes MoE config.json
+moe_arch      = "Qwen3MoeForCausalLM"                   # what runtime must register to load result
+status        = "measured on Qwen3-0.6B (docs/moefy.md)"

@@ -1,0 +1,23 @@
+# default.toml — MoE tensor-name grammar + output file naming for expert-aware split.
+# NEVER DELETE COMMENTS — explain every non-obvious line.
+# Update comments with the code; do not strip them.
+# Hot-loadable: drop another *.toml in this folder to teach new arch spellings.
+# Lists from every file merge (deduped); scalar keys must agree or load refuses.
+# Grammar is structural (dot components), mirrors tensor-array src/infer/moe/stream/expert/key-parse.cpp.
+
+expert_count_keys   = ["num_experts", "num_local_experts", "n_routed_experts"]  # Qwen-MoE / Mixtral / DeepSeek
+config_scopes       = ["text_config", "language_config", "llm_config"]          # VLM wrappers nest LM config
+layer_components    = ["layers", "h", "blocks"]                                 # <comp>.<int> = layer index
+stacked_components  = ["switch_mlp"]                                            # tensors under it are [E, ...]
+indexed_components  = ["experts"]                                               # experts.<int>.* = one expert
+fused_components    = ["experts"]                                               # experts.<proj> with leading E
+resident_components = ["shared_expert", "shared_expert_gate", "shared_experts"] # always-resident, never routed
+
+destacked_prefix = "e"                     # tensor-array slab-repack convention: <name>.e007 (no leading E dim)
+destacked_digits = 3                       # zero-pad width of expert id in suffix
+
+# tensor-array loads only model-*.safetensors when an index exists (src/infer/model-load/load/weights/safetensors.cpp),
+# so names keep "model-" prefix. Paste-style "shared.safetensors" would be silently skipped.
+shared_file = "model-shared.safetensors"
+expert_file = "model-experts-{index:03d}.safetensors"
+layer_file  = "model-layer-{index:03d}.safetensors"

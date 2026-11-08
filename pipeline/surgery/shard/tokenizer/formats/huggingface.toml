@@ -1,0 +1,2 @@
+# Filename families are format contracts, not a fixed list of checkpoint files.
+patterns = ["tokenizer*", "vocab.*", "merges.*", "*tokens*.json", "chat_template*", "chat_templates/**/*", "generation_config.json"]

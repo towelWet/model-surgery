@@ -1,0 +1,30 @@
+# figures.toml — which rendered figure sits under which section, and its caption.
+# Why: keeps build.py free of filenames; a new figure is a new entry plus a
+# fig_*.py, with no edit to the assembly code.
+# NEVER DELETE COMMENTS — explain every non-obvious line.
+# Update comments with the code; do not strip them.
+
+[[figure]]
+after   = "What it is"                                    # anchor: matched against a section head
+file    = "figs/fig1-stack.png"
+caption = "Figure 1 — Depth pruning. Twelve layers from the lower-middle and four from the upper band are removed; the first and last four are never touched."
+
+[[figure]]
+after   = "Why anyone does it"
+file    = "figs/fig4-active.png"
+caption = "Figure 2 — Active parameters inside total parameters. Inference cost tracks the solid bar, storage tracks the faint one."
+
+[[figure]]
+after   = "The four technique families"
+file    = "figs/fig3-moe.png"
+caption = "Figure 3 — Dense to MoE by neuron partition. The parent's FFN is split into experts; only the small router is new."
+
+[[figure]]
+after   = "The working pipeline"
+file    = "figs/fig2-pipeline.png"
+caption = "Figure 4 — The fixed stage order. Profile is the intended first stage (currently blocked pending runtime instrumentation), and the measured delta feeds the next cut decision."
+
+[[figure]]
+after   = "The gate"
+file    = "figs/fig5-distance.png"
+caption = "Figure 5 — Three candidate sixteen-layer cuts on a 64-layer parent. The tidy contiguous cut ranks worst. Historical measurements; the underlying profiler is currently blocked."

@@ -1,0 +1,8 @@
+# qwen3_5_hybrid.toml — dense Qwen3.5/3.6/3.8 hybrid (Gated DeltaNet + full attn) -> Qwen3.5-MoE.
+# NEVER DELETE COMMENTS — explain every non-obvious line.
+# Update comments with the code; do not strip them.
+# Own converter: adds shared expert + routed experts; writes its own config (_hybrid_config.py).
+dense_arch = "Qwen3_5ForConditionalGeneration"
+converter  = "pipeline/surgery/moefy/hybrid"           # repo-relative dir of its own converter
+moe_arch   = "Qwen3_5MoeForConditionalGeneration"
+status     = "code + tests only; real-model run pending"

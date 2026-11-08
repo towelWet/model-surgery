@@ -1,0 +1,51 @@
+# site_task.toml — site-generation bench task: brief, system prompts, HTML scaffold. Data only.
+# NEVER DELETE COMMENTS — explain every non-obvious line.
+# Update comments with the code; do not strip them.
+# Goal: fewer completion tokens than open-ended "build a website" prompts.
+# The scaffold carries layout boilerplate; the model fills copy + accent CSS only.
+
+reference_brief = '''
+Landing page for a fictional coffee roaster 'North Star Roast'. Sections: hero, three feature cards, simple menu (3 items), footer with email.'''
+
+# One file, no external assets, no JS frameworks — keeps output ~3-8K tokens vs 15-25K.
+system_prompt = '''
+You are a front-end engineer. Output exactly ONE complete HTML file.
+Rules:
+- Single file: inline <style> only; no CDN, no npm, no React, no Tailwind.
+- No markdown fences, no commentary before or after the HTML.
+- Semantic tags, mobile-friendly viewport, accessible contrast.
+- Keep CSS concise; avoid duplicate rules and huge gradients.
+- Do not enable chain-of-thought; write HTML directly.'''
+
+# Scaffold path: ~400 tok input saves ~800-1200 tok of repeated head/CSS in output (~40-60% vs full page).
+scaffold_fill_system = '''
+You fill a pre-built HTML shell. Output ONLY what goes inside <body> (and optional
+<title>…</title> as the first line if you change the page title).
+Rules:
+- Do NOT repeat <!DOCTYPE>, <html>, <head>, the existing <style> block, or </body></html>.
+- You MAY add one small <style> block at the top of your output for page-specific accents only.
+- Use semantic sections (header, main, footer). No CDN, no JS frameworks, no markdown fences.
+- Write HTML directly; no commentary.'''
+
+scaffold = '''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><!-- title --></title>
+  <style>
+    :root { --bg:#0f1419; --fg:#e7e9ea; --accent:#1d9bf0; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, sans-serif; background:var(--bg); color:var(--fg); }
+    header, main, footer { max-width: 56rem; margin: 0 auto; padding: 1.25rem; }
+    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <!-- CONTENT -->
+</body>
+</html>'''
+
+scaffold_marker = "<!-- CONTENT -->"                    # replaced by model body in merge_scaffold

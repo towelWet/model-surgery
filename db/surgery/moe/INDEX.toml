@@ -1,0 +1,46 @@
+# MoE expert surgery — current 2026 technique reference
+# Technique reference organized by dimension: scoring / pruning / compression (rev-db style).
+# Pure generic technique reference. Project application (our 80e defect + crackme
+# surgery plan) lives in ~/.claude/skills/ai-customization/surgery/.
+
+[scoring]            # how to score an expert's importance
+reap            = "scoring/reap.md"            # g·‖e‖ gate×norm (baseline, in our code). CORRECTNESS FIX: renormalize top-k router logits to sum to 1 before scoring (Cerebras, Mar 2026); our early runs likely used raw logits = wrong.
+unified_scoring = "scoring/unified-scoring.md" # freq×gate×norm; task-specific keeps freq+gate
+
+[pruning]            # deleting experts (keep the specialists)
+domain_coding_prune = "pruning/domain-coding-prune.md" # Half the Experts, All the Code
+aimer               = "pruning/aimer.md"              # calibration-free mean|W|/RMS; APPLIED (t72/t74, broke tool-args)
+hope                = "pruning/hope.md"                # higher-order, pairwise cooperation; UNTRIED. Best on AGENTIC tasks needing diverse expert combos = our failure mode.
+super_experts       = "pruning/super-experts.md"       # protect the load-bearing few
+attn_guided_coverage= "pruning/attn-guided-coverage.md" # TOP PICK: channel-coverage prune; VALIDATED on Qwen3-30B-A3B (5.27x + 4bit, acc preserved). ICML2026 spotlight. UNTRIED.
+maestro             = "pruning/maestro.md"             # current SOTA, beats REAP +3.6%@50% (GPT-OSS-20B). UNTRIED.
+eep                 = "pruning/eep.md"                 # gradient-free EVOLUTIONARY keep-set search; could optimize vs a tool-calling objective. UNTRIED.
+stun                = "pruning/stun.md"                # structured->unstructured, single forward pass (cheapest scorer). UNTRIED.
+naee_diep_evoesap   = "pruning/naee-diep-evoesap.md"    # non-uniform per-LAYER allocation family; layer the keep-budget, not flat. UNTRIED.
+razor               = "pruning/razor.md"               # drop REPLACEABLE (redundant) experts; arXiv 2609.30465. Paper NOT read. UNTRIED.
+dynamic_topk        = "pruning/dynamic-topk.md"        # per-token: run ~2/3 of chosen top-k; keeps all experts. Paper NOT read (X repost 2026-10-09).
+
+[merging]            # fold experts together; LOSES to pruning on 30B-A3B (ref dimension) — see merging/INDEX.toml
+hc_smoe = "merging/hc-smoe.md"  # output-clustering merge; 65.2% vs REAP 95.9% on our model
+m_smoe  = "merging/m-smoe.md"   # routing-logit merge; weaker than HC-SMoE
+
+[healing]            # recover capability AFTER compression — the step t61-t72 SKIPPED (see healing/INDEX.toml)
+router_kd         = "healing/router-kd.md"        # CRITICAL fix: train router only to match base dist; cures garbage tool-args; best on fine-grained 128e MoE
+moe_pruner_kd     = "healing/moe-pruner-kd.md"    # expert-wise KD from intact teacher; ~99% recovery
+lora_self_distill = "healing/lora-self-distill.md"# LoRA r64 attn/shared, experts frozen; distill on real god RE tool traces
+
+[compression]        # shrink WITHOUT deleting experts (best for keeping RE knowledge)
+lorexperts = "compression/lorexperts.md"  # router-preserving low-rank (PRIMARY)
+conmoe     = "compression/conmoe.md"       # prototype consolidation (cheaper)
+escha_w2   = "compression/escha-w2.md"     # 2-bit Qwen3.6-35B-A3B, all experts, quant + recovery FT; vendor claims ~FP8; no MLX runtime
+router_precision = "compression/router-precision.md"  # keep gate bf16; ours are 8-bit (measured 2026-11-02). LFM2.5 evidence only.
+
+[serving]            # keep ALL experts; cut MEMORY, not count (the path that actually won)
+expert_prefetch = "serving/expert-prefetch.md"  # Edge0 / Colibri / Maya / Kapitsa prior art; CPU streamed forward = calibration-watchdog idea
+slab = "~/.claude/skills/tensor-array/research/2026-10-moe-expert-streaming-novel-system.md"  # expert-major repack → SSD stream; intact 256e; t84 PASS. Not surgery (no deletion).
+
+[not_a_method]       # disambiguation — do not cite these as surgery techniques
+razor = "CORRECTED 2026-11-02: RAZOR IS a real paper (arXiv 2609.30465, see pruning/razor.md) but NOT implemented in this stack. Also appears as text inside whittle teacher .jsonl data. 'use RAZOR' = unimplemented method — clarify before acting."
+
+[application]        # not here — project-specific, in the crackme skill
+note = "~/.claude/skills/ai-customization/surgery/ — 80e-defect.md + crackme-surgery-plan.md"
